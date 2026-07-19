@@ -1,10 +1,10 @@
 # company.json
 
-An open specification for publishing authoritative organization information.
+An open proposal for publishing first-party organization information on the web.
 
 ## Status
 
-Early draft.
+Early draft. The specification is not yet stable and may change based on implementation experience and public feedback.
 
 ## Website
 
@@ -14,16 +14,26 @@ https://companyjson.org
 
 - Simple
 - Open
-- Stable
+- Interoperable
+- Explicitly versioned
 - Easy to implement
 
-## Repository Structure
+## Current repository structure
 
-- SPECIFICATION.md
-- PRINCIPLES.md
-- DECISIONS.md
-- schema/
-- examples/
+- `WHY.md`
+- `GOALS-AND-NONGOALS.md`
+- `PRINCIPLES.md`
+- `DECISIONS.md`
+- `docs/FAQ.md`
+- `schema/`
+- `examples/`
+
+## Planned
+
+- `SPECIFICATION.md`
+- Formal JSON Schema
+- Conformance tests
+- Reference examples
 
 ## Project documents
 
