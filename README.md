@@ -25,6 +25,13 @@ https://companyjson.org
 - schema/
 - examples/
 
+## Project documents
+
+- [Why company.json?](WHY.md)
+- [Goals and non-goals](GOALS-AND-NONGOALS.md)
+- [Principles](PRINCIPLES.md)
+- [Project decisions](DECISIONS.md)
+  
 ## License
 
 MIT
