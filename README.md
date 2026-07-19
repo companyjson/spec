@@ -31,6 +31,7 @@ https://companyjson.org
 - [Goals and non-goals](GOALS-AND-NONGOALS.md)
 - [Principles](PRINCIPLES.md)
 - [Project decisions](DECISIONS.md)
+- [Frequently asked questions](docs/FAQ.md)
   
 ## License
 
