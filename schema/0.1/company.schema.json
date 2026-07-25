@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://companyjson.org/schema/0.1/company.schema.json",
+  "title": "company.json v0.1",
+  "description": "Machine-readable conformance aid for the company.json specification, version 0.1 Draft. The specification prose is normative; if this schema and the specification conflict, the specification governs (Spec §4). Rules this schema cannot express are listed in the top-level $comment.",
+  "$comment": "NOT ENFORCED BY THIS SCHEMA (validators must implement separately, per Spec §4): duplicate raw JSON property names (§7.3, requires raw-input inspection); host binding and redirect authorization (§11); URL reachability (§12.5); uniqueness of contact `type` values across the contacts array (§9.9, JSON Schema uniqueItems only rejects fully identical objects); alternateNames repeating the value of `name` (§9.5, no cross-property reference); mutual-declaration evaluation (§9.10.2); the 1 MiB size floor (§7.2); leading/trailing whitespace warnings (§12.4, SHOULD-level); HTML markup detection in human-readable values (§9.6 and §12.4, requires an HTML parser or documented heuristic); all other SHOULD-level guidance. FORMAT ASSERTION: RFC 3339 date/date-time validity (e.g. rejecting February 30) and IRI syntax require a validator configured to assert recognized formats, or equivalent application-level semantic checks; under the standard Draft 2020-12 dialect, `format` is annotation-only by default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "specVersion",
+    "name",
+    "url"
+  ],
+  "properties": {
+    "specVersion": {
+      "type": "string",
+      "const": "0.1",
+      "description": "Specification version this document conforms to. Spec §9.1."
+    },
+    "name": {
+      "$ref": "#/$defs/nonEmptyString",
+      "description": "Primary public name of the organization. Spec §9.2."
+    },
+    "url": {
+      "$ref": "#/$defs/httpUrl",
+      "description": "Canonical public website. Used for host binding (Spec §11). Spec §9.3.",
+      "$comment": "MUST NOT contain a fragment (§9.3).",
+      "pattern": "^[^#]*$"
+    },
+    "legalName": {
+      "$ref": "#/$defs/nonEmptyString",
+      "description": "Registered or formal legal name. Spec §9.4."
+    },
+    "alternateNames": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "description": "Other recognized names. SHOULD NOT repeat `name` (not schema-enforceable). Spec §9.5."
+    },
+    "description": {
+      "$ref": "#/$defs/nonEmptyString",
+      "description": "Concise first-party description. MUST NOT contain HTML markup; HTML detection requires an application-level semantic check. Spec §9.6."
+    },
+    "logo": {
+      "$ref": "#/$defs/httpUrl",
+      "description": "URL of the preferred official logo. One logo in the v0.1 core. Spec §9.7."
+    },
+    "sameAs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/httpUrl"
+      },
+      "description": "Official organization profiles hosted by other services. URLs only in v0.1. Spec §9.8."
+    },
+    "contacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/contact"
+      },
+      "description": "Public contact channels. At most one entry per `type` (§9.9; array-level uniqueness of `type` is NOT enforced by this schema - see top-level $comment)."
+    },
+    "relationships": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/relationship"
+      },
+      "description": "Declared relationships to other organizations or brands. Duplicate relationship objects SHOULD be reported as warnings, not rejected (Spec §12.6), so uniqueItems is deliberately NOT asserted here; strict mode may enforce it. Spec §9.10."
+    },
+    "brandResources": {
+      "$ref": "#/$defs/httpUrl",
+      "description": "URL of an official brand, press, or media-resource page. Spec §9.11."
+    },
+    "lastUpdated": {
+      "type": "string",
+      "oneOf": [
+        {
+          "format": "date",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$"
+        },
+        {
+          "format": "date-time",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])[Tt]([01]\\d|2[0-3]):[0-5]\\d:([0-5]\\d|60)(\\.\\d+)?([Zz]|[+-]([01]\\d|2[0-3]):[0-5]\\d)$"
+        }
+      ],
+      "description": "RFC 3339 full-date or date-time of the last meaningful profile update. Patterns are asserted because `format` is annotation-only in draft 2020-12. Spec §9.12."
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "iri",
+            "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:\\S+$"
+          },
+          {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$"
+          }
+        ]
+      },
+      "additionalProperties": true,
+      "description": "Namespaced non-core data. Keys MUST be an absolute URI (any scheme, e.g. https:, urn:, did:) or a reverse-domain-style name with >=2 dot-separated labels, no leading/trailing hyphens. Values may be any JSON. Spec §9.13."
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "$comment": "At least one non-whitespace character (Spec §12.4)."
+    },
+    "httpUrl": {
+      "type": "string",
+      "format": "iri",
+      "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://[^/?#@\\s]+(?:[/?#]\\S*)?$",
+      "$comment": "Absolute HTTP(S) IRI. The authority component may not contain '@' (no embedded credentials, Spec §12.5) or whitespace. `format` is annotation-only in draft 2020-12, so the pattern is asserted; validators should additionally assert the `iri` format (note: `iri` support varies across validators — application-level IRI checking is an acceptable substitute). Schemes are case-insensitive per RFC 3986; strict mode may warn on non-lowercase schemes."
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "email"
+          ]
+        },
+        {
+          "required": [
+            "telephone"
+          ]
+        },
+        {
+          "required": [
+            "url"
+          ]
+        }
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "general",
+            "press",
+            "support",
+            "sales",
+            "security",
+            "privacy",
+            "other"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "email": {
+          "$ref": "#/$defs/nonEmptyString",
+          "$comment": "SHOULD be a plain address, not a mailto: URL (§9.9). SHOULD-level, so not pattern-enforced here; strict mode may reject 'mailto:' prefixes."
+        },
+        "telephone": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "url": {
+          "$ref": "#/$defs/httpUrl"
+        }
+      },
+      "if": {
+        "properties": {
+          "type": {
+            "const": "other"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "name"
+        ]
+      },
+      "$comment": "MUST include at least one of email, telephone, url (§9.9). A contact of type 'other' MUST include a non-empty name (§9.9)."
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "parentOrganization",
+            "subOrganization",
+            "brand",
+            "member",
+            "memberOf",
+            "affiliate"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "url": {
+          "$ref": "#/$defs/httpUrl"
+        },
+        "profile": {
+          "$ref": "#/$defs/httpUrl"
+        }
+      },
+      "$comment": "Reciprocity evaluation (§9.10.2) is consumer behavior, not document validity, and is not expressed here."
+    }
+  }
+}
