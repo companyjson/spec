@@ -20,6 +20,7 @@ https://companyjson.org
 
 ## Current repository structure
 
+- `SPECIFICATION.md`
 - `WHY.md`
 - `GOALS-AND-NONGOALS.md`
 - `PRINCIPLES.md`
@@ -30,7 +31,6 @@ https://companyjson.org
 
 ## Planned
 
-- `SPECIFICATION.md`
 - Formal JSON Schema
 - Conformance tests
 - Reference examples
