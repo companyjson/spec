@@ -26,14 +26,16 @@ https://companyjson.org
 - `PRINCIPLES.md`
 - `DECISIONS.md`
 - `docs/FAQ.md`
-- `schema/`
-- `examples/`
+- `docs/REFERENCE-IMPLEMENTATION.md`
+- `schema/` — formal JSON Schema for version 0.1
+- `examples/` — live reference profiles (System Three Resins, MTN Coat)
+- `tools/resolver.py` — reference resolver (discovery, binding, mutual-declaration evaluation)
+- `tools/tests/` — fixture-based and live integration test suite
+- `site/` — companyjson.org
 
 ## Planned
 
-- Formal JSON Schema
-- Conformance tests
-- Reference examples
+- Formal conformance test corpus (positive/negative fixtures against the JSON Schema)
 
 ## Project documents
 
@@ -42,6 +44,7 @@ https://companyjson.org
 - [Principles](PRINCIPLES.md)
 - [Project decisions](DECISIONS.md)
 - [Frequently asked questions](docs/FAQ.md)
+- [Reference implementation](docs/REFERENCE-IMPLEMENTATION.md)
   
 ## License
 

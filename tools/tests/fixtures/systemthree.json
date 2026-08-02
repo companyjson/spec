@@ -1,0 +1,44 @@
+{
+  "specVersion": "0.1",
+  "name": "System Three Resins",
+  "legalName": "System Three Resins, Inc.",
+  "alternateNames": [
+    "System Three"
+  ],
+  "url": "https://www.systemthree.com/",
+  "description": "Manufacturer of epoxy adhesives, coatings, encapsulants, and composite resin systems since 1979.",
+  "logo": "https://www.systemthree.com/cdn/shop/files/System_Logo_410x.png",
+  "sameAs": [
+    "https://facebook.com/systemthree",
+    "https://www.instagram.com/systemthree",
+    "https://twitter.com/systemthree",
+    "https://vimeo.com/systemthree",
+    "https://www.youtube.com/c/SystemThree"
+  ],
+  "contacts": [
+    {
+      "type": "general",
+      "email": "info@systemthree.com",
+      "telephone": "+1-800-333-5514",
+      "url": "https://www.systemthree.com/pages/contact-us"
+    },
+    {
+      "type": "support",
+      "email": "support@systemthree.com",
+      "url": "https://support.systemthree.com/hc/en-us"
+    },
+    {
+      "type": "press",
+      "email": "info@systemthree.com"
+    }
+  ],
+  "relationships": [
+    {
+      "type": "brand",
+      "name": "MTN Coat",
+      "url": "https://mtncoat.com/",
+      "profile": "https://mtncoat.com/company.json"
+    }
+  ],
+  "lastUpdated": "2026-07-25"
+}
