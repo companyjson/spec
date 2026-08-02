@@ -1,0 +1,28 @@
+{
+  "specVersion": "0.1",
+  "name": "MTN Coat",
+  "url": "https://mtncoat.com/",
+  "description": "High-performance epoxy adhesives and coatings formulated specifically for indoor climbing walls.",
+  "logo": "https://mtncoat.com/cdn/shop/files/Punch_Logo_bde1271c-dc17-456b-a245-0db3aa119b55.png",
+  "sameAs": [
+    "https://instagram.com/mtncoat",
+    "https://facebook.com/mtncoat",
+    "https://twitter.com/mtncoat"
+  ],
+  "contacts": [
+    {
+      "type": "general",
+      "email": "info@mtncoat.com",
+      "url": "https://mtncoat.com/pages/contact-us"
+    }
+  ],
+  "relationships": [
+    {
+      "type": "parentOrganization",
+      "name": "System Three Resins",
+      "url": "https://www.systemthree.com/",
+      "profile": "https://www.systemthree.com/company.json"
+    }
+  ],
+  "lastUpdated": "2026-07-25"
+}
