@@ -5,10 +5,14 @@ test_live.py proves the resolver works against two real, cooperating,
 correctly-configured publishers. It does not exercise the failure paths
 the specification spends most of its words on: a relationship declared
 by only one side, a counterpart that can't be fetched, a counterpart
-that declares an incompatible relationship type, and binding failures
+that declares an incompatible relationship type, binding failures
 caused by an insecure redirect chain -- either starting over HTTP
 (spec Sec 11.4) or downgrading to HTTP partway through (spec Sec 11.3
-condition 5, distinct from Sec 11.4).
+condition 5, distinct from Sec 11.4) -- a relationship whose own url
+and profile fields disagree about which host they name, an unsupported
+specVersion that must be reported as such rather than as generically
+invalid (spec Sec 12.1), and host normalization that must discard only
+the *default* port, not every port (spec Sec 11.1 step 6).
 
 These are synthetic fixtures constructed in-process against
 evaluate_binding() and evaluate_mutual() directly. No network access
@@ -210,6 +214,73 @@ def test_wrong_relationship_type():
     check("wrong relationship type: status is conflicting", status == "conflicting", status)
 
 
+def test_relationship_profile_host_mismatch():
+    """The relationship's own url and profile fields disagree about
+    which host they name -- url points at Org B, profile points
+    somewhere unrelated. Trusting profile here would let a relationship
+    link one entity while proving reciprocity against a different one.
+    Must refuse to evaluate rather than silently proceed."""
+    rel = {
+        "type": "brand", "name": "Org B",
+        "url": "https://b.example/",
+        "profile": "https://unrelated.example/company.json",
+    }
+    fetcher = FakeFetcher({})  # deliberately empty: must never be fetched
+    status, detail = resolver.evaluate_mutual(rel, "a.example", fetcher, None)
+    check("profile/url host mismatch: status is unavailable",
+          status == "unavailable", status)
+    check("profile/url host mismatch: detail explains the mismatch",
+          "does not match" in detail, detail)
+
+
+# ------------------------------------------------------------ host normalization
+
+def test_normalize_host_preserves_nondefault_port():
+    """Spec Sec 11.1 step 6: ignore only the *default* port for the
+    scheme, not every port -- a non-default port must not be discarded,
+    or example.com:8443 would wrongly bind as equivalent to example.com."""
+    check("default HTTPS port (443) is ignored",
+          resolver.normalize_host("https://example.com:443/x") == "example.com")
+    check("default HTTP port (80) is ignored",
+          resolver.normalize_host("http://example.com:80/x") == "example.com")
+    check("non-default port is preserved",
+          resolver.normalize_host("https://example.com:8443/x") == "example.com:8443")
+    check("non-default port makes the host distinct from the bare host",
+          resolver.normalize_host("https://example.com:8443/x")
+          != resolver.normalize_host("https://example.com/x"))
+
+
+# ----------------------------------------------------- version handling: Sec 12.1
+
+SCHEMA_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..",
+    "schema", "0.1", "company.schema.json",
+)
+
+
+def test_unsupported_specversion_not_treated_as_invalid():
+    """Spec Sec 12.1: a document declaring an unsupported specVersion
+    must be reported as unsupported, not silently run through the v0.1
+    schema and reported as generically invalid."""
+    doc = {"specVersion": "0.2", "name": "Org A", "url": "https://a.example/"}
+    fetcher = FakeFetcher({
+        "https://a.example/company.json": json_fetch_result(
+            "https://a.example/company.json", doc
+        ),
+    })
+    validator = (resolver.Draft202012Validator(json.load(open(SCHEMA_PATH)))
+                 if resolver.Draft202012Validator else None)
+    result = resolver.resolve("a.example", fetcher, validator, check_mutual=False)
+    check("unsupported specVersion: recorded on the result",
+          result.get("specVersion") == "0.2", result.get("specVersion"))
+    check("unsupported specVersion: not run through the v0.1 validator "
+          "(valid stays None, not False)",
+          result["valid"] is None, result["valid"])
+    check("unsupported specVersion: surfaced in notes",
+          any("unsupported specVersion" in n for n in result["notes"]),
+          result["notes"])
+
+
 # ---------------------------------------------------------------------- main
 
 def main():
@@ -218,6 +289,9 @@ def main():
     test_one_sided_relationship()
     test_counterpart_unavailable()
     test_wrong_relationship_type()
+    test_relationship_profile_host_mismatch()
+    test_normalize_host_preserves_nondefault_port()
+    test_unsupported_specversion_not_treated_as_invalid()
     print(f"\n{'ALL TESTS PASS' if ok else 'FAILURES PRESENT'}")
     sys.exit(0 if ok else 1)
 

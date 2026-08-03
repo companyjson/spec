@@ -31,17 +31,31 @@ except ImportError:
 
 MAX_BYTES = 1_048_576  # spec §7.2
 UA = "companyjson-resolver/0.1 (+https://companyjson.org)"
+SUPPORTED_SPEC_VERSION = "0.1"
 
 # ---------------------------------------------------------------- utilities
 
 def normalize_host(url_or_host):
-    """Spec §11.1 host normalization. Returns normalized host or None."""
+    """Spec §11.1 host normalization. Returns normalized host or None.
+
+    Step 6 says to ignore the *default* port for the scheme, not every
+    port -- a non-default port is preserved so example.com:8443 is not
+    treated as equivalent to example.com.
+    """
     s = url_or_host
+    port_suffix = ""
     if "://" in s:
         p = urllib.parse.urlsplit(s)
         if p.scheme not in ("http", "https"):
             return None
         host = p.hostname or ""
+        try:
+            port = p.port
+        except ValueError:
+            port = None
+        default_port = 80 if p.scheme == "http" else 443
+        if port is not None and port != default_port:
+            port_suffix = f":{port}"
     else:
         host = s
     try:
@@ -51,7 +65,7 @@ def normalize_host(url_or_host):
     host = host.lower().rstrip(".")                 # steps 3-4
     if host.startswith("www."):                     # step 5
         host = host[4:]
-    return host or None
+    return (host + port_suffix) if host else None
 
 
 class _Fetcher:
@@ -228,6 +242,18 @@ RECIPROCAL = {"parentOrganization": {"subOrganization", "brand"},
 def evaluate_mutual(rel, origin_declared_host, fetcher, validator):
     if "profile" not in rel:
         return "declared", "no profile URL to check"
+    if rel.get("url"):
+        url_host = normalize_host(rel["url"])
+        profile_host = normalize_host(rel["profile"])
+        if url_host and profile_host and url_host != profile_host:
+            # The relationship's own url and profile disagree about which
+            # host they name. Trusting profile here would let a relationship
+            # link one entity (url) while proving reciprocity against an
+            # unrelated document (profile) fetched from a different host --
+            # refuse rather than silently evaluate the wrong entity.
+            return ("unavailable",
+                    f"declared profile host ({profile_host!r}) does not "
+                    f"match declared url host ({url_host!r})")
     r = fetcher.fetch(rel["profile"])
     if r["error"] or r["status"] != 200 or not r["body"]:
         return "unavailable", r["error"] or f"HTTP {r['status']}"
@@ -272,7 +298,17 @@ def resolve(domain, fetcher, validator, check_mutual=True, discovery_path="/comp
             doc = None
         if isinstance(doc, dict):
             out["profile"], out["source"] = doc, "first-party (company.json)"
-            if validator:
+            out["specVersion"] = doc.get("specVersion")
+            if out["specVersion"] != SUPPORTED_SPEC_VERSION:
+                # Spec §12.1: report as an unsupported version, not as
+                # invalid -- a document must not be treated as malformed
+                # solely because this resolver lacks its matching schema.
+                out["notes"].append(
+                    f"unsupported specVersion {out['specVersion']!r}; this "
+                    f"resolver only validates {SUPPORTED_SPEC_VERSION!r} "
+                    "(spec §12.1) -- not evaluated as invalid solely for that reason"
+                )
+            elif validator:
                 errs = [f"{e.json_path}: {e.message}" for e in validator.iter_errors(doc)]
                 out["valid"], out["validation_errors"] = not errs, errs
             out["binding"], notes = evaluate_binding(r, doc.get("url"), discovery_path)
@@ -332,7 +368,9 @@ def main():
     if p.get("description"): print(f"  {p['description']}")
     print(f"\n  Source:   {res['source'] or 'none'}")
     if res["binding"]: print(f"  Binding:  {res['binding']}")
-    if res["valid"] is not None:
+    if res.get("specVersion") not in (None, SUPPORTED_SPEC_VERSION):
+        print(f"  Schema:   unsupported specVersion {res['specVersion']!r}")
+    elif res["valid"] is not None:
         print(f"  Schema:   {'valid' if res['valid'] else 'INVALID'}")
         for e in res["validation_errors"]: print(f"            - {e}")
     for k in ("url", "legalName", "logo"):
