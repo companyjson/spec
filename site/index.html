@@ -6,7 +6,7 @@
   <title>company.json</title>
   <meta
     name="description"
-    content="An open proposal for publishing first-party organization information on the web."
+    content="Make sure AI gets your company right. company.json gives AI systems one official, machine-readable place to find accurate information about your organization."
   >
   <style>
     :root {
@@ -51,8 +51,14 @@
     }
 
     .status {
-      display: inline-block;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       margin-bottom: 24px;
+    }
+
+    .status span {
+      display: inline-block;
       padding: 6px 10px;
       border: 1px solid #cfd5dc;
       border-radius: 999px;
@@ -62,19 +68,33 @@
       text-transform: uppercase;
     }
 
+    .status span.live {
+      border-color: #bfe2d2;
+      background: #edf9f3;
+      color: #1f7a52;
+    }
+
     .lead {
-      margin: 0;
+      margin: 0 0 14px;
       max-width: 620px;
       font-size: clamp(1.18rem, 2.5vw, 1.55rem);
-      line-height: 1.5;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+
+    .sub {
+      margin: 0;
+      max-width: 560px;
+      font-size: 1.05rem;
+      line-height: 1.6;
       color: #41464d;
     }
 
     nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 34px;
+      gap: 8px 18px;
+      margin-top: 30px;
     }
 
     a {
@@ -83,12 +103,61 @@
       text-underline-offset: 4px;
     }
 
+    h2.section-heading {
+      margin: 44px 0 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7b828c;
+      border-top: 1px solid #e1e4e8;
+      padding-top: 28px;
+    }
+
+    .proof {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .proof li {
+      border: 1px solid #e1e4e8;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .proof .org {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-weight: 650;
+    }
+
+    .proof .org a {
+      font-weight: 600;
+      font-size: 0.88rem;
+      font-family: ui-monospace, "SF Mono", "Cascadia Code", monospace;
+      white-space: nowrap;
+    }
+
+    .proof p {
+      margin: 6px 0 0;
+      color: #565c65;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
     footer {
-      margin-top: 48px;
+      margin-top: 40px;
       padding-top: 22px;
       border-top: 1px solid #e1e4e8;
       color: #656b73;
-      font-size: 0.93rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -103,14 +172,27 @@
         box-shadow: none;
       }
 
-      .lead,
+      .sub,
+      .proof p,
       footer {
         color: #b9c0c8;
       }
 
-      .status,
-      footer {
+      .status span,
+      h2.section-heading,
+      footer,
+      .proof li {
         border-color: #353a42;
+      }
+
+      h2.section-heading {
+        color: #8b929c;
+      }
+
+      .status span.live {
+        border-color: #2c5c47;
+        background: #12241c;
+        color: #6fcf9e;
       }
     }
 
@@ -118,29 +200,71 @@
       main {
         padding: 36px 26px;
       }
+
+      .proof .org {
+        flex-direction: column;
+        gap: 2px;
+      }
     }
   </style>
 </head>
 <body>
   <main>
-    <div class="status">Early draft</div>
+    <div class="status">
+      <span>v0.1 draft</span>
+      <span class="live">Live in production</span>
+    </div>
 
     <h1><code>company.json</code></h1>
 
-    <p class="lead">
-      An open proposal for publishing first-party organization information
-      on the web.
+    <p class="lead">Make sure AI gets your company right.</p>
+    <p class="sub">
+      AI is becoming a primary way people learn about a company &mdash; and it
+      often gets the basics wrong: an old logo, a former CEO, the wrong
+      pricing page. <code>company.json</code> gives AI systems, and anyone
+      else, one official place to find the real answer: your name, official
+      site, logo, contacts, brands, and more &mdash; published on your own
+      domain, controlled by you.
     </p>
 
     <nav aria-label="Project links">
+      <a href="https://github.com/companyjson/spec/blob/main/SPECIFICATION.md">Read the specification</a>
+      <a href="https://companyjson.org/schema/0.1/company.schema.json">View the schema</a>
       <a href="https://github.com/companyjson/spec">View on GitHub</a>
       <a href="mailto:hello@companyjson.org">Contact</a>
       <a href="mailto:feedback@companyjson.org">Send feedback</a>
     </nav>
 
+    <h2 class="section-heading">Live in production</h2>
+    <ul class="proof">
+      <li>
+        <div class="org">
+          <span>System Three Resins</span>
+          <a href="https://systemthree.com/company.json">systemthree.com/company.json</a>
+        </div>
+        <p>Manufacturer of epoxy adhesives, coatings, and composite resin systems since 1979.</p>
+      </li>
+      <li>
+        <div class="org">
+          <span>MTN Coat</span>
+          <a href="https://mtncoat.com/company.json">mtncoat.com/company.json</a>
+        </div>
+        <p>
+          A System Three brand for climbing-wall coatings. Each profile
+          declares its relationship to the other &mdash; brand and parent
+          organization &mdash; and a reference resolver that fetches both
+          independently confirms the relationship is
+          <strong>mutually declared</strong>.
+        </p>
+      </li>
+    </ul>
+
     <footer>
-      The specification, schema, examples, and discovery mechanism are under
-      active development.
+      Version 0.1 is a draft: some details may still change before 1.0. It
+      isn't a proposal on paper &mdash; two organizations already publish it
+      today, and the schema resolves at the URL it identifies. Read the
+      specification to see exactly how it works, or open either file above
+      directly.
     </footer>
   </main>
 </body>
