@@ -30,7 +30,7 @@ https://companyjson.org
 - `schema/` — formal JSON Schema for version 0.1
 - `examples/` — live reference profiles (System Three Resins, MTN Coat)
 - `tools/resolver.py` — reference resolver (discovery, binding, mutual-declaration evaluation)
-- `tools/tests/` — fixture-based and live integration test suite
+- `tools/tests/` — live integration suite, plus resolver binding and relationship-reciprocity edge-case tests
 - `site/` — companyjson.org
 
 ## Planned
